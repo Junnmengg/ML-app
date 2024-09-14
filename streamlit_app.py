@@ -84,7 +84,7 @@ if 'comparative_results' not in st.session_state:
 # Select Clustering Algorithm
 algorithm = st.sidebar.selectbox(
     "Select Clustering Algorithm",
-    ["Gaussian Mixture Model (GMM)", "Hierarchical Clustering", "DBSCAN", "Mean Shift", "Spectral CLustering"]
+    ["Gaussian Mixture Model (GMM)", "Hierarchical Clustering", "DBSCAN", "Mean Shift", "Spectral Clustering"]
 )
 
 if uploaded_files and len(uploaded_files) == 2:
