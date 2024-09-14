@@ -28,7 +28,7 @@ selected_vars = [
 ]
 
 # File upload
-uploaded_files = st.sidebar.file_uploader("Upload your datasets (MinMax Scaled and Standard Scaled)", type=["csv", "xlsx"], accept_multiple_files=True)
+uploaded_files = st.sidebar.file_uploader("Upload your datasets", type=["csv", "xlsx"], accept_multiple_files=True)
 
 # Check if two datasets are uploaded
 if uploaded_files and len(uploaded_files) == 2:
@@ -46,7 +46,7 @@ if uploaded_files and len(uploaded_files) == 2:
     st.write("Standard Scaled Data Overview:")
     st.write(X_standard.head())
 else:
-    st.info("Please upload exactly two datasets: one MinMax scaled and one Standard scaled.")
+    st.info("Please upload datasets")
 
 # Function for interactive data exploration
 def explore_data(data):
@@ -84,7 +84,7 @@ if 'comparative_results' not in st.session_state:
 # Select Clustering Algorithm
 algorithm = st.sidebar.selectbox(
     "Select Clustering Algorithm",
-    ["Gaussian Mixture Model (GMM)", "HDBSCAN", "DBSCAN", "Autoencoder", "Isolation Forest"]
+    ["Gaussian Mixture Model (GMM)", "Hierarchical Clustering", "DBSCAN", "Mean Shift", "Spectral CLustering"]
 )
 
 if uploaded_files and len(uploaded_files) == 2:
