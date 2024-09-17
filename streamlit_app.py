@@ -54,7 +54,7 @@ def plot_clusters(X, labels, title):
     st.plotly_chart(fig)
 
 # Function to apply PCA after clustering
-def apply_pca_after_clustering(data, labels, n_components):
+def apply_pca_after_clustering(data, labels, n_components=3):
     pca = PCA(n_components=n_components)
     X_pca = pca.fit_transform(data)
     plot_clusters(X_pca, labels, f"PCA Visualization with {n_components} Components and Clusters")
@@ -66,66 +66,47 @@ def evaluate_clustering(X, labels):
     calinski_harabasz = calinski_harabasz_score(X, labels)
     return silhouette, davies_bouldin, calinski_harabasz
 
-# Select Clustering Algorithm
-algorithm = st.sidebar.selectbox(
-    "Select Clustering Algorithm",
-    ["Gaussian Mixture Model (GMM)", "Hierarchical Clustering", "DBSCAN", "Spectral Clustering"]
-)
-
-# User input for number of clusters
-n_clusters = st.sidebar.slider("Number of Clusters", 2, 10, 3)
-
-# User input for number of PCA components
-n_pca_components = st.sidebar.slider("Number of PCA Components", 2, 10, 2)
-
 if uploaded_file:
     # Define clustering models
-    def gmm_clustering(X, n_clusters):
+    def gmm_clustering(X, n_clusters=2):
         gmm = GaussianMixture(n_components=n_clusters, random_state=0)
         labels = gmm.fit_predict(X)
         bic = gmm.bic(X)
         aic = gmm.aic(X)
         return labels, bic, aic
 
-    def hierarchical_clustering(X, n_clusters):
+    def hierarchical_clustering(X, n_clusters=2):
         model = AgglomerativeClustering(n_clusters=n_clusters)
         labels = model.fit_predict(X)
         return labels
 
-    def dbscan_clustering(X, eps, min_samples):
+    def dbscan_clustering(X, eps=0.5, min_samples=5):
         dbscan = DBSCAN(eps=eps, min_samples=min_samples)
         return dbscan.fit_predict(X)
 
-    def spectral_clustering(X, n_clusters):
+    def spectral_clustering(X, n_clusters=2):
         model = SpectralClustering(n_clusters=n_clusters, assign_labels="discretize", random_state=0)
         return model.fit_predict(X)
 
-    # Sidebar options for DBSCAN
-    if algorithm == "DBSCAN":
-        eps = st.sidebar.slider('Epsilon (eps)', 0.1, 2.0, 0.5)
-        min_samples = st.sidebar.slider('Min Samples', 1, 20, 5)
-    else:
-        eps = 0.5  # Default values
-        min_samples = 5
-
     # Perform clustering
+    algorithm = "Gaussian Mixture Model (GMM)"  # You can change this to use a different algorithm
     st.write(f"Processing data with {algorithm}...")
 
     if algorithm == "Gaussian Mixture Model (GMM)":
-        labels, bic, aic = gmm_clustering(X_marketing_campaign, n_clusters)
+        labels, bic, aic = gmm_clustering(X_marketing_campaign)
         st.write(f"BIC Score: {bic:.4f}, AIC Score: {aic:.4f}")
     elif algorithm == "Hierarchical Clustering":
-        labels = hierarchical_clustering(X_marketing_campaign, n_clusters)
+        labels = hierarchical_clustering(X_marketing_campaign)
         # Plot dendrogram for hierarchical clustering
         st.subheader("Dendrogram for Hierarchical Clustering")
         Z = linkage(X_marketing_campaign, 'ward')
         fig, ax = plt.subplots()
-        dendrogram(Z, ax=ax, truncate_mode='lastp', p=n_clusters)
+        dendrogram(Z, ax=ax, truncate_mode='lastp', p=3)
         st.pyplot(fig)
     elif algorithm == "DBSCAN":
-        labels = dbscan_clustering(X_marketing_campaign, eps, min_samples)
+        labels = dbscan_clustering(X_marketing_campaign)
     elif algorithm == "Spectral Clustering":
-        labels = spectral_clustering(X_marketing_campaign, n_clusters)
+        labels = spectral_clustering(X_marketing_campaign)
 
     # Evaluate clustering performance
     silhouette, db, ch = evaluate_clustering(X_marketing_campaign, labels)
@@ -135,7 +116,7 @@ if uploaded_file:
 
     # Apply PCA after clustering and plot
     st.subheader(f'PCA Visualization with Clustering')
-    apply_pca_after_clustering(X_marketing_campaign, labels, n_pca_components)
+    apply_pca_after_clustering(X_marketing_campaign, labels)
 
 # Button to update clustering in real-time
 if st.sidebar.button('Update Clustering'):
