@@ -84,7 +84,7 @@ if 'comparative_results' not in st.session_state:
 # Select Clustering Algorithm
 algorithm = st.sidebar.selectbox(
     "Select Clustering Algorithm",
-    ["Gaussian Mixture Model (GMM)", "Hierarchical Clustering", "DBSCAN", "Mean Shift", "Spectral Clustering"]
+    ["Gaussian Mixture Model (GMM)", "Hierarchical Clustering", "DBSCAN", "Spectral Clustering"]
 )
 
 if uploaded_files and len(uploaded_files) == 2:
@@ -200,9 +200,3 @@ st.plotly_chart(fig)
 # Button to update clustering in real-time
 if st.sidebar.button('Update Clustering'):
     st.experimental_rerun()
-
-# Customization options
-st.sidebar.title('Customization')
-theme = st.sidebar.selectbox('Choose Theme', ['Light', 'Dark'])
-if theme == 'Dark':
-    st.write('<style>body { background-color: #2E2E2E; color: white; }</style>', unsafe_allow_html=True)
