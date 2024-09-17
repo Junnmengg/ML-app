@@ -12,7 +12,7 @@ from sklearn.ensemble import IsolationForest
 from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
 
 # Set page title and layout
-st.title('Interactive Clustering and Anomaly Detection Dashboard')
+st.title('Interactive Clustering Dashboard')
 st.sidebar.title('Options')
 
 # Define the selected variables for clustering
