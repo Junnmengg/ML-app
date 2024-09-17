@@ -54,7 +54,7 @@ def plot_clusters(X, labels, title):
     st.plotly_chart(fig)
 
 # Function to apply PCA after clustering
-def apply_pca_after_clustering(data, labels, n_components=3):
+def apply_pca_after_clustering(data, labels, n_components=2):
     pca = PCA(n_components=n_components)
     X_pca = pca.fit_transform(data)
     plot_clusters(X_pca, labels, f"PCA Visualization with {n_components} Components and Clusters")
@@ -83,14 +83,14 @@ def evaluate_clustering(X, labels):
 
 if uploaded_file:
     # Define clustering models
-    def gmm_clustering(X, n_clusters=2):
+    def gmm_clustering(X, n_clusters=3):
         gmm = GaussianMixture(n_components=n_clusters, random_state=0)
         labels = gmm.fit_predict(X)
         bic = gmm.bic(X)
         aic = gmm.aic(X)
         return labels, bic, aic
 
-    def hierarchical_clustering(X, n_clusters=2):
+    def hierarchical_clustering(X, n_clusters=3):
         model = AgglomerativeClustering(n_clusters=n_clusters)
         labels = model.fit_predict(X)
         return labels
@@ -100,7 +100,7 @@ if uploaded_file:
         return dbscan.fit_predict(X)
 
     # Spectral Clustering with PCA
-    def spectral_clustering_with_pca(X, n_clusters=2, n_components=10):
+    def spectral_clustering_with_pca(X, n_clusters=3, n_components=10):
         pca = PCA(n_components=n_components)
         X_pca = pca.fit_transform(X)
         model = SpectralClustering(n_clusters=n_clusters, assign_labels="discretize", random_state=0, affinity='nearest_neighbors')
@@ -109,7 +109,7 @@ if uploaded_file:
     # Sidebar option for selecting the clustering algorithm
     algorithm = st.sidebar.selectbox(
         "Select Clustering Algorithm",
-        ["Gaussian Mixture Model (GMM)", "Hierarchical Clustering", "DBSCAN", "Spectral Clustering with PCA"]
+        ["Gaussian Mixture Model (GMM)", "Hierarchical Clustering", "DBSCAN", "Spectral Clustering"]
     )
 
     # Perform clustering based on selected algorithm
@@ -128,7 +128,7 @@ if uploaded_file:
         st.pyplot(fig)
     elif algorithm == "DBSCAN":
         labels = dbscan_clustering(X_marketing_campaign)
-    elif algorithm == "Spectral Clustering with PCA":
+    elif algorithm == "Spectral Clustering":
         labels = spectral_clustering_with_pca(X_marketing_campaign)
 
     # Evaluate clustering performance
