@@ -16,8 +16,8 @@ st.sidebar.title('Options')
 
 # Define the selected variables for clustering
 selected_vars = [
-    'Annual_Income', 'Kidhome', 'Teenhome', 'Recency',
-    'Wines', 'Fruits', 'Meat', 'Fish', 'Sweets', 'Gold',
+    'Income', 'Kidhome', 'Teenhome', 'Recency',
+    'MntWines', 'MntFruits', 'MntMeatProducts', 'MntFishProducts', 'MntSweetProducts', 'MntGoldProds',
     'NumDealsPurchases', 'NumWebPurchases', 'NumCatalogPurchases', 'NumStorePurchases', 'NumWebVisitsMonth'
 ]
 
