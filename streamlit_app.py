@@ -88,8 +88,13 @@ if uploaded_file:
         model = SpectralClustering(n_clusters=n_clusters, assign_labels="discretize", random_state=0)
         return model.fit_predict(X)
 
-    # Perform clustering
-    algorithm = "Gaussian Mixture Model (GMM)"  # You can change this to use a different algorithm
+    # Sidebar option for selecting the clustering algorithm
+    algorithm = st.sidebar.selectbox(
+        "Select Clustering Algorithm",
+        ["Gaussian Mixture Model (GMM)", "Hierarchical Clustering", "DBSCAN", "Spectral Clustering"]
+    )
+
+    # Perform clustering based on selected algorithm
     st.write(f"Processing data with {algorithm}...")
 
     if algorithm == "Gaussian Mixture Model (GMM)":
