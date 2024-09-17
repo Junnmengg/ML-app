@@ -109,7 +109,7 @@ if uploaded_file:
     # Sidebar option for selecting the clustering algorithm
     algorithm = st.sidebar.selectbox(
         "Select Clustering Algorithm",
-        ["Gaussian Mixture Model (GMM)", "Hierarchical Clustering", "DBSCAN", "Spectral Clustering with PCA"]
+        ["Gaussian Mixture Model (GMM)", "Hierarchical Clustering", "DBSCAN", "Spectral Clustering"]
     )
 
     # Perform clustering based on selected algorithm
@@ -128,7 +128,7 @@ if uploaded_file:
         st.pyplot(fig)
     elif algorithm == "DBSCAN":
         labels = dbscan_clustering(X_marketing_campaign)
-    elif algorithm == "Spectral Clustering with PCA":
+    elif algorithm == "Spectral Clustering":
         labels = spectral_clustering_with_pca(X_marketing_campaign)
 
     # Evaluate clustering performance
