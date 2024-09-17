@@ -99,14 +99,17 @@ if uploaded_file:
         dbscan = DBSCAN(eps=eps, min_samples=min_samples)
         return dbscan.fit_predict(X)
 
-    def spectral_clustering(X, n_clusters=2):
-        model = SpectralClustering(n_clusters=n_clusters, assign_labels="discretize", random_state=0)
-        return model.fit_predict(X)
+    # Spectral Clustering with PCA
+    def spectral_clustering_with_pca(X, n_clusters=2, n_components=10):
+        pca = PCA(n_components=n_components)
+        X_pca = pca.fit_transform(X)
+        model = SpectralClustering(n_clusters=n_clusters, assign_labels="discretize", random_state=0, affinity='nearest_neighbors')
+        return model.fit_predict(X_pca)
 
     # Sidebar option for selecting the clustering algorithm
     algorithm = st.sidebar.selectbox(
         "Select Clustering Algorithm",
-        ["Gaussian Mixture Model (GMM)", "Hierarchical Clustering", "DBSCAN", "Spectral Clustering"]
+        ["Gaussian Mixture Model (GMM)", "Hierarchical Clustering", "DBSCAN", "Spectral Clustering with PCA"]
     )
 
     # Perform clustering based on selected algorithm
@@ -125,8 +128,8 @@ if uploaded_file:
         st.pyplot(fig)
     elif algorithm == "DBSCAN":
         labels = dbscan_clustering(X_marketing_campaign)
-    elif algorithm == "Spectral Clustering":
-        labels = spectral_clustering(X_marketing_campaign)
+    elif algorithm == "Spectral Clustering with PCA":
+        labels = spectral_clustering_with_pca(X_marketing_campaign)
 
     # Evaluate clustering performance
     silhouette, db, ch = evaluate_clustering(X_marketing_campaign, labels)
