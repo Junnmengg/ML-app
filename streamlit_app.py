@@ -7,7 +7,8 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import DBSCAN, AgglomerativeClustering
 from sklearn.cluster import SpectralClustering
 from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
-import hdbscan
+from scipy.cluster.hierarchy import dendrogram, linkage
+import matplotlib.pyplot as plt
 
 # Set page title and layout
 st.title('Interactive Clustering Dashboard')
@@ -23,7 +24,7 @@ selected_vars = [
 # File upload
 uploaded_file = st.sidebar.file_uploader("Upload your dataset", type=["csv", "xlsx"])
 
-# Check if the datasets are uploaded
+# Check if the dataset is uploaded
 if uploaded_file:
     
     marketing_campaign_data = pd.read_csv(uploaded_file) if uploaded_file.name.endswith('csv') else pd.read_excel(uploaded_file)
@@ -53,10 +54,10 @@ def plot_clusters(X, labels, title):
     st.plotly_chart(fig)
 
 # Function to apply PCA after clustering
-def apply_pca_after_clustering(data, labels):
-    pca = PCA(n_components=2)
+def apply_pca_after_clustering(data, labels, n_components):
+    pca = PCA(n_components=n_components)
     X_pca = pca.fit_transform(data)
-    plot_clusters(X_pca, labels, "PCA Visualization with Clusters")
+    plot_clusters(X_pca, labels, f"PCA Visualization with {n_components} Components and Clusters")
 
 # Function to evaluate clustering performance
 def evaluate_clustering(X, labels):
@@ -71,22 +72,32 @@ algorithm = st.sidebar.selectbox(
     ["Gaussian Mixture Model (GMM)", "Hierarchical Clustering", "DBSCAN", "Spectral Clustering"]
 )
 
+# User input for number of clusters
+n_clusters = st.sidebar.slider("Number of Clusters", 2, 10, 3)
+
+# User input for number of PCA components
+n_pca_components = st.sidebar.slider("Number of PCA Components", 2, 10, 2)
+
 if uploaded_file:
     # Define clustering models
-    def gmm_clustering(X):
-        gmm = GaussianMixture(n_components=3, random_state=0)
-        return gmm.fit_predict(X)
+    def gmm_clustering(X, n_clusters):
+        gmm = GaussianMixture(n_components=n_clusters, random_state=0)
+        labels = gmm.fit_predict(X)
+        bic = gmm.bic(X)
+        aic = gmm.aic(X)
+        return labels, bic, aic
 
-    def hierarchical_clustering(X):
-        model = AgglomerativeClustering(n_clusters=3)
-        return model.fit_predict(X)
+    def hierarchical_clustering(X, n_clusters):
+        model = AgglomerativeClustering(n_clusters=n_clusters)
+        labels = model.fit_predict(X)
+        return labels
 
     def dbscan_clustering(X, eps, min_samples):
         dbscan = DBSCAN(eps=eps, min_samples=min_samples)
         return dbscan.fit_predict(X)
 
-    def spectral_clustering(X):
-        model = SpectralClustering(n_clusters=3, assign_labels="discretize", random_state=0)
+    def spectral_clustering(X, n_clusters):
+        model = SpectralClustering(n_clusters=n_clusters, assign_labels="discretize", random_state=0)
         return model.fit_predict(X)
 
     # Sidebar options for DBSCAN
@@ -101,13 +112,20 @@ if uploaded_file:
     st.write(f"Processing data with {algorithm}...")
 
     if algorithm == "Gaussian Mixture Model (GMM)":
-        labels = gmm_clustering(X_marketing_campaign)
+        labels, bic, aic = gmm_clustering(X_marketing_campaign, n_clusters)
+        st.write(f"BIC Score: {bic:.4f}, AIC Score: {aic:.4f}")
     elif algorithm == "Hierarchical Clustering":
-        labels = hierarchical_clustering(X_marketing_campaign)
+        labels = hierarchical_clustering(X_marketing_campaign, n_clusters)
+        # Plot dendrogram for hierarchical clustering
+        st.subheader("Dendrogram for Hierarchical Clustering")
+        Z = linkage(X_marketing_campaign, 'ward')
+        fig, ax = plt.subplots()
+        dendrogram(Z, ax=ax, truncate_mode='lastp', p=n_clusters)
+        st.pyplot(fig)
     elif algorithm == "DBSCAN":
         labels = dbscan_clustering(X_marketing_campaign, eps, min_samples)
     elif algorithm == "Spectral Clustering":
-        labels = spectral_clustering(X_marketing_campaign)
+        labels = spectral_clustering(X_marketing_campaign, n_clusters)
 
     # Evaluate clustering performance
     silhouette, db, ch = evaluate_clustering(X_marketing_campaign, labels)
@@ -117,7 +135,7 @@ if uploaded_file:
 
     # Apply PCA after clustering and plot
     st.subheader(f'PCA Visualization with Clustering')
-    apply_pca_after_clustering(X_marketing_campaign, labels)
+    apply_pca_after_clustering(X_marketing_campaign, labels, n_pca_components)
 
 # Button to update clustering in real-time
 if st.sidebar.button('Update Clustering'):
