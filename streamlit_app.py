@@ -61,9 +61,24 @@ def apply_pca_after_clustering(data, labels, n_components=3):
 
 # Function to evaluate clustering performance
 def evaluate_clustering(X, labels):
-    silhouette = silhouette_score(X, labels)
-    davies_bouldin = davies_bouldin_score(X, labels)
-    calinski_harabasz = calinski_harabasz_score(X, labels)
+    unique_labels = np.unique(labels)
+    
+    # Handle cases where there is only one or no cluster
+    if len(unique_labels) < 2:
+        st.write("Not enough clusters to compute performance metrics.")
+        return None, None, None
+
+    # Compute metrics only for non-noise points in DBSCAN
+    if -1 in unique_labels:
+        mask = labels != -1  # Ignore noise points (labeled as -1)
+        silhouette = silhouette_score(X[mask], labels[mask])
+        davies_bouldin = davies_bouldin_score(X[mask], labels[mask])
+        calinski_harabasz = calinski_harabasz_score(X[mask], labels[mask])
+    else:
+        silhouette = silhouette_score(X, labels)
+        davies_bouldin = davies_bouldin_score(X, labels)
+        calinski_harabasz = calinski_harabasz_score(X, labels)
+
     return silhouette, davies_bouldin, calinski_harabasz
 
 if uploaded_file:
@@ -116,8 +131,11 @@ if uploaded_file:
     # Evaluate clustering performance
     silhouette, db, ch = evaluate_clustering(X_marketing_campaign, labels)
 
-    # Display evaluation results
-    st.write(f"Silhouette Score: {silhouette:.4f}, Davies-Bouldin Score: {db:.4f}, Calinski-Harabasz Score: {ch:.4f}")
+    # Display evaluation results only if metrics are computed
+    if silhouette is not None:
+        st.write(f"Silhouette Score: {silhouette:.4f}, Davies-Bouldin Score: {db:.4f}, Calinski-Harabasz Score: {ch:.4f}")
+    else:
+        st.write("Clustering could not be evaluated (e.g., not enough clusters or only noise).")
 
     # Apply PCA after clustering and plot
     st.subheader(f'PCA Visualization with Clustering')
