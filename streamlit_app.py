@@ -54,7 +54,7 @@ def plot_clusters(X, labels, title):
     st.plotly_chart(fig)
 
 # Function to apply PCA after clustering
-def apply_pca_after_clustering(data, labels, n_components=2):
+def apply_pca_after_clustering(data, labels, n_components=3):
     pca = PCA(n_components=n_components)
     X_pca = pca.fit_transform(data)
     plot_clusters(X_pca, labels, f"PCA Visualization with {n_components} Components and Clusters")
