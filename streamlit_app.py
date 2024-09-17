@@ -122,7 +122,3 @@ if uploaded_file:
     # Apply PCA after clustering and plot
     st.subheader(f'PCA Visualization with Clustering')
     apply_pca_after_clustering(X_marketing_campaign, labels)
-
-# Button to update clustering in real-time
-if st.sidebar.button('Update Clustering'):
-    st.experimental_rerun()
